@@ -11,6 +11,12 @@ public class PedidoComida extends Pedido {
 
     @Override
     public int calcularTiempoEntrega() {
-        return TIEMPO_BASE_MINUTOS + MINUTOS_POR_KILOMETRO * getDistanciaKm();
+        return TIEMPO_BASE_MINUTOS + (MINUTOS_POR_KILOMETRO * getDistanciaKm());
+    }
+
+
+    @Override
+    public void asignarRepartidor() {
+        this.repartidorAsignado = "Luis Díaz (Repartidor de Comida)";
     }
 }

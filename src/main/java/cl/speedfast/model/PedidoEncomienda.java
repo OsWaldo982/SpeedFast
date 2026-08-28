@@ -14,4 +14,10 @@ public class PedidoEncomienda extends Pedido {
         return (int) Math.round(TIEMPO_BASE_MINUTOS
                 + MINUTOS_POR_KILOMETRO * getDistanciaKm());
     }
+
+
+    @Override
+    public void asignarRepartidor() {
+        this.repartidorAsignado = "Daniela Tapia (Repartidor Encomienda)";
+    }
 }

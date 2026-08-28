@@ -1,26 +1,44 @@
 package cl.speedfast;
 
-import cl.speedfast.model.Pedido;
 import cl.speedfast.model.PedidoComida;
 import cl.speedfast.model.PedidoEncomienda;
 import cl.speedfast.model.PedidoExpress;
+import cl.speedfast.service.ControladorDeEnvios;
 
 public class Main {
 
     public static void main(String[] args) {
-        // No se puede crear new Pedido() porque Pedido es una clase abstracta
-        Pedido[] pedidos = {
-                new PedidoComida(1, "Av. Italia 456", 4),
-                new PedidoEncomienda(2, "Av. Independencia 123", 6),
-                new PedidoExpress(3, "Av. Apoquindo 1500", 7)
-        };
+        ControladorDeEnvios controlador = new ControladorDeEnvios();
 
-        System.out.println("=== TIEMPOS ESTIMADOS DE ENTREGA ===");
-        for (Pedido pedido : pedidos) {
-            pedido.mostrarResumen();
-            System.out.println("Tiempo estimado de entrega: "
-                    + pedido.calcularTiempoEntrega() + " minutos");
-            System.out.println();
-        }
+        //Datos
+        PedidoComida p201 = new PedidoComida(201, "Av. Providencia 1200", 3);
+        PedidoEncomienda p202 = new PedidoEncomienda(202, "Calle los Alerces 45", 8);
+        PedidoExpress p203 = new PedidoExpress(203, "Av. Las Condes 9000", 4);
+
+        //repartidores
+        p201.asignarRepartidor("Gonzalo Perez");
+        p202.asignarRepartidor("Valentina Silva");
+        p203.asignarRepartidor(); // Usa la asignación automática por defecto
+
+
+        System.out.println("[Pedido Encomienda]");
+        p202.mostrarResumen();
+        p202.despachar();
+        controlador.registrarPedido(p202);
+
+        System.out.println();
+
+        System.out.println("Cancelando Pedido Express #" + p203.getIdPedido() + "...");
+        p203.cancelar();
+        controlador.registrarPedido(p203);
+
+        // Registramos el pedido de comida entregado para el historial
+        p201.despachar();
+        controlador.registrarPedido(p201);
+
+        System.out.println();
+
+        // Mostrar historial de entregas
+        controlador.verHistorial();
     }
 }

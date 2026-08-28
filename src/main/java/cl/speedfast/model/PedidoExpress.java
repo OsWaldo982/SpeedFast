@@ -17,4 +17,10 @@ public class PedidoExpress extends Pedido {
         }
         return TIEMPO_BASE_MINUTOS;
     }
+
+
+    @Override
+    public void asignarRepartidor() {
+        this.repartidorAsignado = "Carlos Pérez (Repartidor Express)";
+    }
 }

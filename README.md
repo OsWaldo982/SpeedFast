@@ -1,29 +1,33 @@
-# SpeedFast
+# SpeedFast - Semana 5
 
-Proyecto desarrollado para la asignatura Desarrollo Orientado a Objetos II.
+Proyecto de **Desarrollo Orientado a Objetos II** basado en el caso SpeedFast.
 
-## Descripción
+## Objetivo
 
-SpeedFast es un sistema sencillo que calcula el tiempo estimado de entrega de
-diferentes tipos de pedidos.
+Continuar el sistema concurrente desarrollado en la Semana 4 incorporando sincronizacion para proteger una zona de carga compartida. Tres repartidores se ejecutan en paralelo y retiran pedidos de forma segura, evitando condiciones de carrera y entregas duplicadas.
 
-El proyecto contiene los siguientes tipos de pedido:
+## Elementos principales
 
-- Pedido de comida.
-- Pedido de encomienda.
-- Pedido express.
+- `Pedido`: clase base de los pedidos, ahora con estado.
+- `EstadoPedido`: enum con `PENDIENTE`, `EN_REPARTO` y `ENTREGADO`.
+- `ZonaDeCarga`: recurso compartido protegido mediante metodos `synchronized`.
+- `Repartidor`: implementa `Runnable` y consume pedidos desde la misma zona de carga.
+- `Main`: carga 6 pedidos, ejecuta 3 repartidores mediante `ExecutorService`, espera su finalizacion y valida que todos queden entregados.
 
-Cada tipo de pedido calcula su tiempo de entrega de una manera diferente.
+Se conservan `PedidoComida`, `PedidoEncomienda` y `PedidoExpress` del proyecto de semanas anteriores para mantener la continuidad del caso.
 
-## Ejecución
+## Ejecucion
 
-1. Abrir el proyecto en IntelliJ IDEA.
-2. Abrir el archivo `Main.java`.
-3. Presionar el botón **Run** para ejecutar el programa.
+1. Abrir la carpeta `SpeedFast` en IntelliJ IDEA.
+2. Usar JDK 17.
+3. Ejecutar `src/main/java/cl/speedfast/Main.java`.
+4. Verificar que cada pedido aparezca una sola vez como retirado y termine en estado `ENTREGADO`.
+5. Al final debe mostrarse: `Todos los pedidos han sido entregados correctamente`.
 
-El programa mostrará en la consola los datos de cada pedido y su tiempo
-estimado de entrega.
+## Entrega
+
+La pauta solicita subir el proyecto a GitHub dentro de una carpeta llamada `semana 5` y entregar tambien un archivo `.zip` o `.rar` funcional.
 
 ## Autor
 
-Osvaldo González
+Osvaldo Gonzalez

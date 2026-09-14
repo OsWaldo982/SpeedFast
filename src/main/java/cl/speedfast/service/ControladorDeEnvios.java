@@ -6,31 +6,34 @@ import cl.speedfast.model.Pedido;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Mantiene el historial final de pedidos procesados.
+ */
 public class ControladorDeEnvios implements Rastreable {
 
-    private List<Pedido> historialPedidos;
+    private final List<Pedido> historialPedidos;
 
     public ControladorDeEnvios() {
         this.historialPedidos = new ArrayList<>();
     }
 
-    // Registra un pedido en la lista del sistema
     public void registrarPedido(Pedido pedido) {
-        historialPedidos.add(pedido);
+        if (pedido != null) {
+            historialPedidos.add(pedido);
+        }
     }
 
-    // Método exigido por la interfaz Rastreable
     @Override
     public void verHistorial() {
-        System.out.println("Historial:");
-        for (Pedido p : historialPedidos) {
-            if (p.isDespachado()) {
-                System.out.println("- " + p.getClass().getSimpleName() + " #" + String.format("%03d", p.getIdPedido()) +
-                        " – entregado por " + p.getRepartidorAsignado());
-            } else if (p.isCancelado()) {
-                System.out.println("- " + p.getClass().getSimpleName() + " #" + String.format("%03d", p.getIdPedido()) +
-                        " – CANCELADO");
-            }
+        System.out.println("Historial final:");
+
+        for (Pedido pedido : historialPedidos) {
+            System.out.println(
+                    "- " + pedido.getClass().getSimpleName()
+                            + " #" + String.format("%03d", pedido.getIdPedido())
+                            + " | " + pedido.getEstado()
+                            + " | repartidor: " + pedido.getRepartidorAsignado()
+            );
         }
     }
 }

@@ -4,36 +4,81 @@ import cl.speedfast.interfaces.Cancelable;
 import cl.speedfast.interfaces.Despachable;
 
 /**
- * Clase base que representa los datos y comportamientos comunes de un pedido
+ * Clase base de los pedidos de SpeedFast.
+ * Mantiene los datos comunes de las semanas anteriores e incorpora
+ * el estado requerido para controlar el proceso concurrente de la Semana 5.
  */
 public abstract class Pedido implements Despachable, Cancelable {
 
-    private int idPedido;
+    private int id;
     private String direccionEntrega;
     private int distanciaKm;
+    private EstadoPedido estado;
     protected String repartidorAsignado;
     protected boolean cancelado;
-    protected boolean despachado;
 
-    public Pedido(int idPedido, String direccionEntrega, int distanciaKm) {
-        this.idPedido = idPedido;
+    public Pedido(int id, String direccionEntrega, int distanciaKm) {
+        this.id = id;
         this.direccionEntrega = direccionEntrega;
         this.distanciaKm = distanciaKm;
+        this.estado = EstadoPedido.PENDIENTE;
         this.repartidorAsignado = "Sin asignar";
         this.cancelado = false;
-        this.despachado = false;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    // Se conserva este getter por compatibilidad con el proyecto de semanas anteriores.
     public int getIdPedido() {
-        return idPedido;
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setIdPedido(int idPedido) {
+        this.id = idPedido;
     }
 
     public String getDireccionEntrega() {
         return direccionEntrega;
     }
 
+    public void setDireccionEntrega(String direccionEntrega) {
+        this.direccionEntrega = direccionEntrega;
+    }
+
     public int getDistanciaKm() {
         return distanciaKm;
+    }
+
+    public void setDistanciaKm(int distanciaKm) {
+        this.distanciaKm = distanciaKm;
+    }
+
+    public EstadoPedido getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoPedido nuevoEstado) {
+        if (nuevoEstado == null) {
+            throw new IllegalArgumentException("El estado del pedido no puede ser nulo.");
+        }
+        this.estado = nuevoEstado;
+    }
+
+    /**
+     * Sobrecarga solicitada en la pauta. Permite actualizar el estado
+     * usando texto, pero valida el valor mediante el enum EstadoPedido.
+     */
+    public void setEstado(String nuevoEstado) {
+        if (nuevoEstado == null || nuevoEstado.isBlank()) {
+            throw new IllegalArgumentException("El estado del pedido no puede estar vacio.");
+        }
+        this.estado = EstadoPedido.valueOf(nuevoEstado.trim().toUpperCase());
     }
 
     public String getRepartidorAsignado() {
@@ -45,52 +90,59 @@ public abstract class Pedido implements Despachable, Cancelable {
     }
 
     public boolean isDespachado() {
-        return despachado;
+        return estado == EstadoPedido.ENTREGADO;
     }
 
-    // --- POLIMORFISMO POR SOBRECARGA ---
-    // por defecto
+    // Polimorfismo por sobrecarga conservado desde las semanas anteriores.
     public void asignarRepartidor() {
-        this.repartidorAsignado = "Repartidor Automático";
+        this.repartidorAsignado = "Repartidor Automatico";
     }
 
-    // manual recibiendo el nombre
     public void asignarRepartidor(String nombreRepartidor) {
         this.repartidorAsignado = nombreRepartidor;
     }
 
-
-
     public void mostrarResumen() {
         System.out.println("[" + getClass().getSimpleName() + "]");
-        System.out.println("Pedido #" + String.format("%03d", idPedido));
-        System.out.println("Dirección: " + direccionEntrega);
+        System.out.println("Pedido #" + String.format("%03d", id));
+        System.out.println("Direccion: " + direccionEntrega);
         System.out.println("Distancia: " + distanciaKm + " km");
+        System.out.println("Estado: " + estado);
         System.out.println("Repartidor asignado: " + repartidorAsignado);
         System.out.println("Tiempo estimado: " + calcularTiempoEntrega() + " minutos");
     }
 
-    //IMPLEMENTACIÓN DE INTERFACES
     @Override
     public void despachar() {
         if (cancelado) {
-            System.out.println("No se puede despachar. El pedido #" + idPedido + " fue cancelado.");
-        } else {
-            this.despachado = true;
-            System.out.println("Pedido despachado correctamente.");
+            throw new IllegalStateException(
+                    "No se puede entregar el pedido #" + id + " porque fue cancelado."
+            );
         }
+        this.estado = EstadoPedido.ENTREGADO;
     }
 
     @Override
     public void cancelar() {
-        if (despachado) {
-            System.out.println("No se puede cancelar el pedido #" + idPedido + " porque ya fue despachado.");
-        } else {
-            this.cancelado = true;
-            System.out.println("→ Pedido cancelado exitosamente.");
+        if (estado == EstadoPedido.ENTREGADO) {
+            System.out.println(
+                    "No se puede cancelar el pedido #" + id + " porque ya fue entregado."
+            );
+            return;
         }
+
+        this.cancelado = true;
+        System.out.println("Pedido #" + id + " cancelado exitosamente.");
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName()
+                + "{id=" + id
+                + ", direccionEntrega='" + direccionEntrega + '\''
+                + ", estado=" + estado
+                + '}';
+    }
 
     public abstract int calcularTiempoEntrega();
 }
